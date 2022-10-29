@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Threading;
 
 /*
 Issue reproducing of
@@ -12,6 +13,7 @@ public class EmitOnCollisionTest_IssueRepro : MonoBehaviour
     [SerializeField] private int _eachEmitCount;
 
     private string _entered = null;
+    private int _threadId = Thread.CurrentThread.ManagedThreadId;
 
     void Start()
     {
@@ -24,9 +26,11 @@ public class EmitOnCollisionTest_IssueRepro : MonoBehaviour
         {
             if (_entered != null)
             {
-                Debug.LogError(gameObject.name + " enters OnParticleCollision" + ", but already entered=" + _entered);
+                Debug.LogError(gameObject.name + " enters OnParticleCollision" + ", but already entered=" + _entered
+                +", _threadId=" + _threadId + ", cur thread=" + Thread.CurrentThread.ManagedThreadId);
             }
             _entered = "OnParticleCollision";
+            _threadId = Thread.CurrentThread.ManagedThreadId;
 
             _associateScript.CallEmit();
         }
@@ -42,9 +46,11 @@ public class EmitOnCollisionTest_IssueRepro : MonoBehaviour
         {
             if (_entered != null)
             {
-                Debug.LogError(gameObject.name + " enters CallEmit" + ", but already entered=" + _entered);
+                Debug.LogError(gameObject.name + " enters CallEmit" + ", but already entered=" + _entered
+                    + ", _threadId=" + _threadId + ", cur thread=" + Thread.CurrentThread.ManagedThreadId);
             }
             _entered = "CallEmit";
+            _threadId = Thread.CurrentThread.ManagedThreadId;
 
             _myParticleSystem.Emit(_eachEmitCount);
             // _myParticleSystem.Play(); // Play cause same issue (Enable Emission module before test)
